@@ -1,6 +1,6 @@
 {
   "name": "@dkamyshov/webpack-hot-persist",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "The persistence API for HMR in webpack.",
   "license": "MIT",
   "scripts": {
@@ -37,6 +37,7 @@
     "src",
     "lib",
     "index.js",
-    "index.d.ts"
+    "index.d.ts",
+    "!src/**/*.spec.ts"
   ]
 }

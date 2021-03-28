@@ -8,6 +8,8 @@ Dead simple persistence API for preserving data across hot reloads in webpack. Z
 $ yarn add -D @dkamyshov/webpack-hot-persist
 ```
 
+Note: if you use TypeScript, you should also install `@types/webpack-env` and `@types/node`. Or you may want to disable type checking of declaration files altogether: https://www.typescriptlang.org/tsconfig#skipLibCheck.
+
 ## Usage
 
 ```js
