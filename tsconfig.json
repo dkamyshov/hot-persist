@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "rootDir": "./src",
+    "outDir": "./lib/esm",
+    "target": "ESNext",
+    "moduleResolution": "node",
+    "module": "ESNext",
+    "pretty": true,
+    "declaration": true,
+    "declarationMap": true,
+    "esModuleInterop": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitAny": true
+  },
+  "include": ["src"]
+}
