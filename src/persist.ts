@@ -1,3 +1,4 @@
+import { getCallCounter, resetCallCounter } from './callCounter';
 import { shallowEqualArrays } from './shallowEqualArrays';
 
 interface PersistedItem<T> {
@@ -6,7 +7,7 @@ interface PersistedItem<T> {
 }
 
 interface ExtendedPersistOptions<T> {
-  key: string;
+  key?: string;
   cleanup?: (instance: T) => void;
 }
 
@@ -15,15 +16,15 @@ type PersistOptions<T> = ExtendedPersistOptions<T> | string;
 function getOrCreateInstance<T>(
   oldInstance: PersistedItem<T> | undefined,
   factory: () => T,
-  options: PersistOptions<T>,
-  dependencies?: unknown[]
+  options: PersistOptions<T> | undefined,
+  dependencies: unknown[] | undefined
 ): PersistedItem<T> {
   if (typeof oldInstance !== 'undefined') {
     if (shallowEqualArrays(oldInstance.dependencies, dependencies)) {
       return oldInstance;
     }
 
-    if (typeof options !== 'string') {
+    if (typeof options === 'object') {
       const { cleanup } = options;
 
       if (typeof cleanup === 'function') {
@@ -41,19 +42,21 @@ function getOrCreateInstance<T>(
 export function persist(mod: NodeModule) {
   return function <T>(
     factory: () => T,
-    options: PersistOptions<T>,
-    dependencies?: unknown[]
+    dependencies?: unknown[],
+    options?: PersistOptions<T>
   ): T {
-    if (
-      process.env.NODE_ENV === 'production' ||
-      typeof mod.hot === 'undefined'
-    ) {
+    const hot = mod.hot;
+
+    if (process.env.NODE_ENV === 'production' || typeof hot === 'undefined') {
       return factory();
     }
 
-    const key = typeof options === 'string' ? options : options.key;
+    const callIndex = getCallCounter(hot);
+    const userDefinedKey = typeof options === 'string' ? options : options?.key;
+    const key =
+      userDefinedKey ?? `__dkamyshov_webpack_hot_persist_indexed[${callIndex}]`;
 
-    const oldInstance = (mod.hot.data?.[key] as unknown) as
+    const oldInstance = (hot.data?.[key] as unknown) as
       | PersistedItem<T>
       | undefined;
 
@@ -64,8 +67,10 @@ export function persist(mod: NodeModule) {
       dependencies
     );
 
-    mod.hot.dispose((data) => {
+    hot.dispose((data) => {
       data[key] = result;
+
+      resetCallCounter(hot);
     });
 
     return result.instance;
