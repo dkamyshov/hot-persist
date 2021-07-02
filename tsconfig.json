@@ -8,6 +8,7 @@
     "module": "ESNext",
     "pretty": true,
     "declaration": true,
+    "sourceMap": true,
     "declarationMap": true,
     "esModuleInterop": true,
     "noUnusedLocals": true,
