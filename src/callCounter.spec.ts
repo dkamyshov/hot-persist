@@ -2,7 +2,7 @@ import { getCallCounter, resetCallCounter } from './callCounter';
 
 describe('callCounter', () => {
   const createModuleHotReference = () => {
-    return ({} as unknown) as NonNullable<NodeModule['hot']>;
+    return {} as unknown as NonNullable<NodeModule['hot']>;
   };
 
   it('sets and resets call counter', () => {

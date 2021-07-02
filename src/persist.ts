@@ -56,7 +56,7 @@ export function persist(mod: NodeModule) {
     const key =
       userDefinedKey ?? `__dkamyshov_webpack_hot_persist_indexed[${callIndex}]`;
 
-    const oldInstance = (hot.data?.[key] as unknown) as
+    const oldInstance = hot.data?.[key] as unknown as
       | PersistedItem<T>
       | undefined;
 

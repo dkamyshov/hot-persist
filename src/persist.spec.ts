@@ -21,7 +21,7 @@ describe('persist', () => {
     };
 
     if (!hot) {
-      const mod = ({} as unknown) as NodeModule;
+      const mod = {} as unknown as NodeModule;
 
       return {
         mod,
@@ -30,7 +30,7 @@ describe('persist', () => {
       };
     }
 
-    const mod = ({
+    const mod = {
       hot: {
         dispose: (callback: DisposeCallback) => {
           disposeCallbacks.push(callback);
@@ -39,7 +39,7 @@ describe('persist', () => {
           return currentData;
         },
       },
-    } as unknown) as NodeModule;
+    } as unknown as NodeModule;
 
     return {
       mod,
