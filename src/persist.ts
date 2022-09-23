@@ -39,8 +39,27 @@ function getOrCreateInstance<T>(
   };
 }
 
+/**
+ * Persist a value across hot reloads.
+ *
+ * ```
+ * // `value === value` after the hot reload
+ * const value = persist(module)(() => ({ property: 'hello, world' }));
+ * ```
+ *
+ * @param mod current module
+ * @returns
+ */
 export function persist(mod: NodeModule) {
-  return function <T>(
+  /**
+   * The persistor function.
+   *
+   * @param factory creates a value
+   * @param dependencies the value updates when dependencies change (referrential equality)
+   * @param options
+   * @returns
+   */
+  const persistor = function <T>(
     factory: () => T,
     dependencies?: unknown[],
     options?: PersistOptions<T>
@@ -75,4 +94,6 @@ export function persist(mod: NodeModule) {
 
     return result.instance;
   };
+
+  return persistor;
 }

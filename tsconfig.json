@@ -1,19 +1,19 @@
 {
   "compilerOptions": {
-    "strict": true,
-    "rootDir": "./src",
-    "outDir": "./lib/esm",
-    "target": "ESNext",
-    "moduleResolution": "node",
-    "module": "ESNext",
-    "pretty": true,
     "declaration": true,
-    "sourceMap": true,
     "declarationMap": true,
     "esModuleInterop": true,
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "noImplicitAny": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noImplicitAny": true
+    "outDir": "./lib/esm",
+    "pretty": true,
+    "rootDir": "./src",
+    "sourceMap": true,
+    "strict": true,
+    "target": "ES2015"
   },
   "include": ["src"]
 }
