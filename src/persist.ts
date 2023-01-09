@@ -73,7 +73,8 @@ export function persist(mod: NodeModule) {
     const callIndex = getCallCounter(hot);
     const userDefinedKey = typeof options === 'string' ? options : options?.key;
     const key =
-      userDefinedKey ?? `__dkamyshov_webpack_hot_persist_indexed[${callIndex}]`;
+      userDefinedKey ??
+      `__dkamyshov_webpack_hot_persist_${__KEY_TOKEN}_indexed[${callIndex}]`;
 
     const oldInstance = hot.data?.[key] as unknown as
       | PersistedItem<T>
