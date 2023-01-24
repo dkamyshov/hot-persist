@@ -1,8 +1,9 @@
 import { getCallCounter, resetCallCounter } from './callCounter';
+import type { HotApi } from './interface';
 
 describe('callCounter', () => {
   const createModuleHotReference = () => {
-    return {} as unknown as NonNullable<NodeModule['hot']>;
+    return {} as unknown as HotApi;
   };
 
   it('sets and resets call counter', () => {

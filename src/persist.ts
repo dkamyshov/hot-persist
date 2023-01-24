@@ -1,4 +1,5 @@
 import { getCallCounter, resetCallCounter } from './callCounter';
+import type { ModuleLike } from './interface';
 import { shallowEqualArrays } from './shallowEqualArrays';
 
 interface PersistedItem<T> {
@@ -39,6 +40,18 @@ function getOrCreateInstance<T>(
   };
 }
 
+function getKey<T>(
+  options: PersistOptions<T> | undefined,
+  callIndex: number
+): string {
+  const userDefinedKey = typeof options === 'string' ? options : options?.key;
+
+  return (
+    userDefinedKey ??
+    `__dkamyshov_hot_persist_${__KEY_TOKEN}_indexed[${callIndex}]`
+  );
+}
+
 /**
  * Persist a value across hot reloads.
  *
@@ -47,10 +60,16 @@ function getOrCreateInstance<T>(
  * const value = persist(module)(() => ({ property: 'hello, world' }));
  * ```
  *
- * @param mod current module
+ * Or:
+ *
+ * ```
+ * const value = persist(import.meta)(() => ({ property: 'hello, world' }));
+ * ```
+ *
+ * @param moduleLike module-like object with `hot` API exposed
  * @returns
  */
-export function persist(mod: NodeModule) {
+export function persist(moduleLike: ModuleLike) {
   /**
    * The persistor function.
    *
@@ -64,17 +83,18 @@ export function persist(mod: NodeModule) {
     dependencies?: unknown[],
     options?: PersistOptions<T>
   ): T {
-    const hot = mod.hot;
+    const hot = moduleLike.webpackHot ?? moduleLike.hot;
 
-    if (process.env.NODE_ENV === 'production' || typeof hot === 'undefined') {
+    if (
+      process.env.NODE_ENV === 'production' ||
+      typeof hot === 'undefined' ||
+      hot === null
+    ) {
       return factory();
     }
 
     const callIndex = getCallCounter(hot);
-    const userDefinedKey = typeof options === 'string' ? options : options?.key;
-    const key =
-      userDefinedKey ??
-      `__dkamyshov_webpack_hot_persist_${__KEY_TOKEN}_indexed[${callIndex}]`;
+    const key = getKey(options, callIndex);
 
     const oldInstance = hot.data?.[key] as unknown as
       | PersistedItem<T>

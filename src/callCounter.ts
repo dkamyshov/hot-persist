@@ -1,15 +1,13 @@
-type ModuleHotReference = NonNullable<NodeModule['hot']>;
+import type { HotApi } from './interface';
 
 interface CallCounterMetadataItem {
   callCounter: number;
 }
 
-type CallCounterMetadata = WeakMap<ModuleHotReference, CallCounterMetadataItem>;
-
-const callCounterMetadata: CallCounterMetadata = new WeakMap();
+const callCounterMetadata = new WeakMap<HotApi, CallCounterMetadataItem>();
 
 const getOrCreateModulePersistenceMetadata = (
-  hot: ModuleHotReference
+  hot: HotApi
 ): CallCounterMetadataItem => {
   const item = callCounterMetadata.get(hot);
 
@@ -26,10 +24,10 @@ const getOrCreateModulePersistenceMetadata = (
   return item;
 };
 
-export const resetCallCounter = (hot: ModuleHotReference): void => {
+export const resetCallCounter = (hot: HotApi): void => {
   callCounterMetadata.delete(hot);
 };
 
-export const getCallCounter = (hot: ModuleHotReference): number => {
+export const getCallCounter = (hot: HotApi): number => {
   return getOrCreateModulePersistenceMetadata(hot).callCounter++;
 };

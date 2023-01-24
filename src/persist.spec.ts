@@ -1,10 +1,11 @@
+import type { ModuleLike } from './interface';
 import { persist } from './persist';
 
 type HMRData = Record<string, unknown>;
 type DisposeCallback = (data: HMRData) => void;
 
 interface ModuleContext {
-  mod: NodeModule;
+  mod: ModuleLike;
   disposeCallbacks: DisposeCallback[];
   setCurrentData: (nextData: HMRData) => void;
 }
@@ -21,7 +22,7 @@ describe('persist', () => {
     };
 
     if (!hot) {
-      const mod = {} as unknown as NodeModule;
+      const mod = {} as unknown as ModuleLike;
 
       return {
         mod,
@@ -39,7 +40,7 @@ describe('persist', () => {
           return currentData;
         },
       },
-    } as unknown as NodeModule;
+    } as unknown as ModuleLike;
 
     return {
       mod,
