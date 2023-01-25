@@ -4,7 +4,17 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 2018,
     sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.eslint.json'],
+    project: [
+      './tsconfig.json',
+      './tsconfig.eslint.json',
+      './integration-tests/orchestrator/tsconfig.json',
+      './integration-tests/repositories/webpack4/tsconfig.json',
+      './integration-tests/repositories/webpack5/tsconfig.json',
+      './integration-tests/repositories/vite2/tsconfig.json',
+      './integration-tests/repositories/vite3/tsconfig.json',
+      './integration-tests/repositories/vite4/tsconfig.json',
+      './integration-tests/repositories/parcel2/tsconfig.json',
+    ],
     tsconfigRootDir: './',
   },
   env: {
@@ -13,4 +23,13 @@ module.exports = {
     es6: true,
     jest: true,
   },
+  overrides: [
+    {
+      files: ['integration-tests/repositories/**/*'],
+      rules: {
+        '@typescript-eslint/no-var-requires': 'off',
+        '@typescript-eslint/ban-ts-comment': 'off',
+      },
+    },
+  ],
 };

@@ -1,0 +1,15 @@
+{
+  "name": "webpack4-integration-test",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "devDependencies": {
+    "@types/webpack-env": "^1.18.0",
+    "html-webpack-plugin": "4",
+    "ts-loader": "^8",
+    "typescript": "^4.9.4",
+    "webpack": "^4",
+    "webpack-cli": "4",
+    "webpack-dev-server": "^3"
+  }
+}

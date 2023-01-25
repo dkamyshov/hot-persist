@@ -1,0 +1,10 @@
+{
+  "name": "vite2-integration-test",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^4.3.2",
+    "vite": "^2"
+  }
+}

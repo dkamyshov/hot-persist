@@ -1,0 +1,10 @@
+{
+  "name": "parcel2-integration-test",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "devDependencies": {
+    "@types/parcel-env": "^0.0.1",
+    "parcel": "^2"
+  }
+}

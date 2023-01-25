@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "strict": true
+  },
+  "include": ["playwright.config.ts", "tests/**/*.ts"],
+  "exclude": ["node_modules"]
+}

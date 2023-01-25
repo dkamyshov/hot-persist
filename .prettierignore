@@ -2,4 +2,5 @@ coverage
 lib
 yarn.lock
 .*
+!.vscode
 !.eslintrc.js

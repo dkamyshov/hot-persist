@@ -1,5 +1,5 @@
 import { getCallCounter, resetCallCounter } from './callCounter';
-import type { ModuleLike } from './interface';
+import type { HotApiProvider } from './interface';
 import { shallowEqualArrays } from './shallowEqualArrays';
 
 interface PersistedItem<T> {
@@ -56,20 +56,20 @@ function getKey<T>(
  * Persist a value across hot reloads.
  *
  * ```
- * // `value === value` after the hot reload
+ * // vite 2/3/4
+ * const value = persist(() => import.meta.hot)(() => ({ property: 'hello, world' }));
+ *
+ * // webpack 4/5, parcel 2
  * const value = persist(module)(() => ({ property: 'hello, world' }));
+ *
+ * // webpack 5
+ * const value = persist(() => import.meta.webpackHot)(() => ({ property: 'hello, world' }));
  * ```
  *
- * Or:
- *
- * ```
- * const value = persist(import.meta)(() => ({ property: 'hello, world' }));
- * ```
- *
- * @param moduleLike module-like object with `hot` API exposed
+ * @param hotApiProvider module-like object with `hot` API exposed or `hot` API getter
  * @returns
  */
-export function persist(moduleLike: ModuleLike) {
+export function persist(hotApiProvider: HotApiProvider) {
   /**
    * The persistor function.
    *
@@ -83,7 +83,16 @@ export function persist(moduleLike: ModuleLike) {
     dependencies?: unknown[],
     options?: PersistOptions<T>
   ): T {
-    const hot = moduleLike.webpackHot ?? moduleLike.hot;
+    const hot =
+      typeof hotApiProvider === 'function'
+        ? hotApiProvider()
+        : hotApiProvider.webpackHot ?? hotApiProvider.hot;
+
+    // uncomment the following to make sure
+    // integration tests could fail
+    // if (Math.random() > -1) {
+    //   return factory();
+    // }
 
     if (
       process.env.NODE_ENV === 'production' ||

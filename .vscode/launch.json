@@ -1,0 +1,23 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug current unit test file",
+      "program": "${workspaceRoot}/node_modules/.bin/jest",
+      "args": ["${relativeFile}"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug current integration test file",
+      "cwd": "${workspaceFolder}/integration-tests/orchestrator",
+      "program": "${workspaceRoot}/integration-tests/orchestrator/node_modules/.bin/playwright",
+      "args": ["test", "--headed", "${file}"]
+    }
+  ]
+}

@@ -67,16 +67,20 @@ describe('persist', () => {
     process.env.NODE_ENV = env;
   });
 
-  const performTest = (isUserDefinedKey: boolean) => {
+  const performTest = (
+    isUserDefinedKey: boolean,
+    isHostGetterSupplied: boolean
+  ) => {
     it('must return old instance in development mode (with no deps specified)', () => {
       const ctx = createModuleContext(true);
-      const a = persist(ctx.mod)(
+      const hotApiHost = isHostGetterSupplied ? ctx.mod : () => ctx.mod.hot;
+      const a = persist(hotApiHost)(
         factory,
         void 0,
         isUserDefinedKey ? 'a' : void 0
       );
       reloadModule(ctx);
-      const b = persist(ctx.mod)(
+      const b = persist(hotApiHost)(
         factory,
         void 0,
         isUserDefinedKey ? 'a' : void 0
@@ -86,14 +90,15 @@ describe('persist', () => {
 
     it("must return old instance if deps didn't change", () => {
       const ctx = createModuleContext(true);
+      const hotApiHost = isHostGetterSupplied ? ctx.mod : () => ctx.mod.hot;
       const dep = {};
-      const a = persist(ctx.mod)(
+      const a = persist(hotApiHost)(
         factory,
         [dep],
         isUserDefinedKey ? 'a' : void 0
       );
       reloadModule(ctx);
-      const b = persist(ctx.mod)(
+      const b = persist(hotApiHost)(
         factory,
         [dep],
         isUserDefinedKey ? 'a' : void 0
@@ -103,13 +108,14 @@ describe('persist', () => {
 
     it('must return new instance if deps changed', () => {
       const ctx = createModuleContext(true);
-      const a = persist(ctx.mod)(
+      const hotApiHost = isHostGetterSupplied ? ctx.mod : () => ctx.mod.hot;
+      const a = persist(hotApiHost)(
         factory,
         [{}],
         isUserDefinedKey ? 'a' : void 0
       );
       reloadModule(ctx);
-      const b = persist(ctx.mod)(
+      const b = persist(hotApiHost)(
         factory,
         [{}],
         isUserDefinedKey ? 'a' : void 0
@@ -119,14 +125,15 @@ describe('persist', () => {
 
     it('must return new instance if NODE_ENV is production', () => {
       const ctx = createModuleContext(true);
+      const hotApiHost = isHostGetterSupplied ? ctx.mod : () => ctx.mod.hot;
       process.env.NODE_ENV = 'production';
-      const a = persist(ctx.mod)(
+      const a = persist(hotApiHost)(
         factory,
         void 0,
         isUserDefinedKey ? 'a' : void 0
       );
       reloadModule(ctx);
-      const b = persist(ctx.mod)(
+      const b = persist(hotApiHost)(
         factory,
         void 0,
         isUserDefinedKey ? 'a' : void 0
@@ -136,13 +143,14 @@ describe('persist', () => {
 
     it('must return new instance if hot mode is unavailable', () => {
       const ctx = createModuleContext(false);
-      const a = persist(ctx.mod)(
+      const hotApiHost = isHostGetterSupplied ? ctx.mod : () => ctx.mod.hot;
+      const a = persist(hotApiHost)(
         factory,
         void 0,
         isUserDefinedKey ? 'a' : void 0
       );
       reloadModule(ctx);
-      const b = persist(ctx.mod)(
+      const b = persist(hotApiHost)(
         factory,
         void 0,
         isUserDefinedKey ? 'a' : void 0
@@ -152,30 +160,39 @@ describe('persist', () => {
 
     it('must return new instances if the deps change in a cascade', () => {
       const ctx = createModuleContext(true);
+      const hotApiHost = isHostGetterSupplied ? ctx.mod : () => ctx.mod.hot;
       const dep = {};
-      const a = persist(ctx.mod)(
+      const a = persist(hotApiHost)(
         factory,
         [dep],
         isUserDefinedKey ? 'a' : void 0
       );
-      const b = persist(ctx.mod)(
+      const b = persist(hotApiHost)(
         factory,
         [a, {}],
         isUserDefinedKey ? 'b' : void 0
       );
-      const c = persist(ctx.mod)(factory, [b], isUserDefinedKey ? 'c' : void 0);
+      const c = persist(hotApiHost)(
+        factory,
+        [b],
+        isUserDefinedKey ? 'c' : void 0
+      );
       reloadModule(ctx);
-      const d = persist(ctx.mod)(
+      const d = persist(hotApiHost)(
         factory,
         [dep],
         isUserDefinedKey ? 'a' : void 0
       );
-      const e = persist(ctx.mod)(
+      const e = persist(hotApiHost)(
         factory,
         [d, {}],
         isUserDefinedKey ? 'b' : void 0
       );
-      const f = persist(ctx.mod)(factory, [e], isUserDefinedKey ? 'c' : void 0);
+      const f = persist(hotApiHost)(
+        factory,
+        [e],
+        isUserDefinedKey ? 'c' : void 0
+      );
       expect(a).toBe(d);
       expect(b).not.toBe(e);
       expect(c).not.toBe(f);
@@ -183,22 +200,39 @@ describe('persist', () => {
 
     it("must return old instances if the deps don't change in a cascade", () => {
       const ctx = createModuleContext(true);
+      const hotApiHost = isHostGetterSupplied ? ctx.mod : () => ctx.mod.hot;
       const dep = {};
-      const a = persist(ctx.mod)(
+      const a = persist(hotApiHost)(
         factory,
         [dep],
         isUserDefinedKey ? 'a' : void 0
       );
-      const b = persist(ctx.mod)(factory, [a], isUserDefinedKey ? 'b' : void 0);
-      const c = persist(ctx.mod)(factory, [b], isUserDefinedKey ? 'c' : void 0);
+      const b = persist(hotApiHost)(
+        factory,
+        [a],
+        isUserDefinedKey ? 'b' : void 0
+      );
+      const c = persist(hotApiHost)(
+        factory,
+        [b],
+        isUserDefinedKey ? 'c' : void 0
+      );
       reloadModule(ctx);
-      const d = persist(ctx.mod)(
+      const d = persist(hotApiHost)(
         factory,
         [dep],
         isUserDefinedKey ? 'a' : void 0
       );
-      const e = persist(ctx.mod)(factory, [d], isUserDefinedKey ? 'b' : void 0);
-      const f = persist(ctx.mod)(factory, [e], isUserDefinedKey ? 'c' : void 0);
+      const e = persist(hotApiHost)(
+        factory,
+        [d],
+        isUserDefinedKey ? 'b' : void 0
+      );
+      const f = persist(hotApiHost)(
+        factory,
+        [e],
+        isUserDefinedKey ? 'c' : void 0
+      );
       expect(a).toBe(d);
       expect(b).toBe(e);
       expect(c).toBe(f);
@@ -206,11 +240,12 @@ describe('persist', () => {
 
     it('extracts key from options object', () => {
       const ctx = createModuleContext(true);
-      const a = persist(ctx.mod)(factory, void 0, {
+      const hotApiHost = isHostGetterSupplied ? ctx.mod : () => ctx.mod.hot;
+      const a = persist(hotApiHost)(factory, void 0, {
         key: isUserDefinedKey ? 'a' : void 0,
       });
       reloadModule(ctx);
-      const b = persist(ctx.mod)(factory, void 0, {
+      const b = persist(hotApiHost)(factory, void 0, {
         key: isUserDefinedKey ? 'a' : void 0,
       });
       expect(a).toBe(b);
@@ -218,13 +253,14 @@ describe('persist', () => {
 
     it('runs cleanup function when the instance updates', () => {
       const ctx = createModuleContext(true);
+      const hotApiHost = isHostGetterSupplied ? ctx.mod : () => ctx.mod.hot;
       const cleanup = jest.fn();
-      const a = persist(ctx.mod)(factory, [{}], {
+      const a = persist(hotApiHost)(factory, [{}], {
         key: isUserDefinedKey ? 'a' : void 0,
         cleanup,
       });
       reloadModule(ctx);
-      persist(ctx.mod)(factory, [{}], {
+      persist(hotApiHost)(factory, [{}], {
         key: isUserDefinedKey ? 'a' : void 0,
         cleanup,
       });
@@ -233,19 +269,32 @@ describe('persist', () => {
 
     it("doesn't run cleanup if it is not specified", () => {
       const ctx = createModuleContext(true);
+      const hotApiHost = isHostGetterSupplied ? ctx.mod : () => ctx.mod.hot;
       const cleanup = jest.fn();
-      persist(ctx.mod)(factory, [{}], { key: isUserDefinedKey ? 'a' : void 0 });
+      persist(hotApiHost)(factory, [{}], {
+        key: isUserDefinedKey ? 'a' : void 0,
+      });
       reloadModule(ctx);
-      persist(ctx.mod)(factory, [{}], { key: isUserDefinedKey ? 'a' : void 0 });
+      persist(hotApiHost)(factory, [{}], {
+        key: isUserDefinedKey ? 'a' : void 0,
+      });
       expect(cleanup).not.toHaveBeenCalled();
     });
   };
 
-  describe('indexed', () => {
-    performTest(false);
+  describe('indexed, hosted hot api', () => {
+    performTest(false, true);
   });
 
-  describe('keyed', () => {
-    performTest(true);
+  describe('indexed, hot api via getter', () => {
+    performTest(false, false);
+  });
+
+  describe('keyed, hosted hot api', () => {
+    performTest(true, true);
+  });
+
+  describe('keyed, hot api via getter', () => {
+    performTest(true, false);
   });
 });
