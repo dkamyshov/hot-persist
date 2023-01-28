@@ -1,7 +1,20 @@
 {
   "name": "@dkamyshov/hot-persist",
   "version": "1.0.0-beta.1",
-  "description": "The persistence API for HMR in webpack.",
+  "description": "The persistence API for HMR in webpack 4/5, vite 2/3/4, parcel 2.",
+  "keywords": [
+    "hot-reload",
+    "hmr",
+    "webpack",
+    "vite",
+    "parcel",
+    "persist",
+    "persistence"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dkamyshov/hot-persist.git"
+  },
   "license": "MIT",
   "main": "./lib/cjs/persist.js",
   "module": "./lib/esm/persist.js",
@@ -40,12 +53,20 @@
   },
   "peerDependencies": {
     "@types/node": "*",
-    "parcel": ">=1",
+    "@types/webpack-env": "*",
+    "@types/parcel-env": "*",
+    "webpack": ">=4",
     "vite": ">=2",
-    "webpack": ">=4"
+    "parcel": ">=2"
   },
   "peerDependenciesMeta": {
     "@types/node": {
+      "optional": true
+    },
+    "@types/webpack-env": {
+      "optional": true
+    },
+    "@types/parcel-env": {
       "optional": true
     },
     "webpack": {

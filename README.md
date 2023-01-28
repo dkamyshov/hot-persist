@@ -1,20 +1,33 @@
-# @dkamyshov/webpack-hot-persist
+# @dkamyshov/hot-persist
 
-Dead simple persistence API for preserving data across hot reloads in webpack. Zero dependencies!
+Dead simple persistence API for preserving data across hot reloads (supports webpack 4/5, vite 2/3/4, parcel 2). Zero dependencies!
 
 ## Installation
 
 ```sh
-$ yarn add -D @dkamyshov/webpack-hot-persist
+$ npm i --save-dev @dkamyshov/hot-persist
+# or
+$ yarn add -D @dkamyshov/hot-persist
 ```
 
-Note: if you use TypeScript, you should also install `@types/webpack-env` and `@types/node`. Or you may want to disable type checking of declaration files altogether: https://www.typescriptlang.org/tsconfig#skipLibCheck.
+- Using TypeScript with `webpack`?
+
+  You should also install `@types/webpack-env` and `@types/node`.
+
+- Using TypeScript with `parcel`?
+
+  You should also install `@types/parcel-env`.
+
+Regardless of what bundler you use, if you use TypeScript, you should consider disabling type checking of declaration files: https://www.typescriptlang.org/tsconfig#skipLibCheck.
 
 ## Usage
 
-```js
-import { persist } from '@dkamyshov/webpack-hot-persist';
+The HMR API is not standardised, so there are several ways to use this package. Examples (see below) use the "legacy" API for brevity.
 
+```js
+import { persist } from '@dkamyshov/hot-persist';
+
+// webpack 4/5 (legacy way)
 const instance = persist(module)(() => {
   return {
     /* ... */
@@ -24,9 +37,31 @@ const instance = persist(module)(() => {
 if (module.hot) {
   module.hot.accept();
 }
+
+// webpack 5 (modern way)
+const instance = persist(() => import.meta.webpackHot)(() => {
+  return {
+    /* ... */
+  };
+});
+
+if (import.meta.webpackHot) {
+  import.meta.webpackHot.accept();
+}
+
+// vite 2/3/4
+const instance = persist(() => import.meta.hot)(() => {
+  return {
+    /* ... */
+  };
+});
+
+if (import.meta.hot) {
+  import.meta.hot.accept();
+}
 ```
 
-The `persist` function accepts the current module and then returns a new function that accepts 3 parameters:
+The `persist` function accepts the object with `hot` API exposed (or a getter function) and then returns a new function which accepts 3 parameters:
 
 1. The `factory` function that returns the instance.
 2. The optional `dependencies` parameter, which is used to decide whether the instance should be recreated.
@@ -53,7 +88,7 @@ Note: in production (NODE_ENV === 'production') the `persist` function immediate
 ## Examples
 
 ```js
-import { persist } from '@dkamyshov/webpack-hot-persist';
+import { persist } from '@dkamyshov/hot-persist';
 
 // Example 1. This instance never updates.
 const value = persist(module)(() => {
