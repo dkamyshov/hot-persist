@@ -1,6 +1,6 @@
 {
   "name": "@dkamyshov/hot-persist",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0",
   "description": "The persistence API for HMR in webpack 4/5, vite 2/3/4, parcel 2.",
   "keywords": [
     "hot-reload",
