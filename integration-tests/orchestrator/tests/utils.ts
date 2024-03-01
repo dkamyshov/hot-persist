@@ -30,7 +30,7 @@ export interface RunningProcess {
 export const run = (
   rootDir: string,
   relativePathToExecutable: string,
-  args: string[]
+  args: string[],
 ): RunningProcess => {
   const handle = spawn(`${rootDir}/${relativePathToExecutable}`, args, {
     cwd: rootDir,
@@ -80,8 +80,8 @@ export const run = (
           cleanup();
           reject(
             new Error(
-              `timed out: haven't seen "${text}" in stdout for ${timeout} ms`
-            )
+              `timed out: haven't seen "${text}" in stdout for ${timeout} ms`,
+            ),
           );
         }, 5000);
       });

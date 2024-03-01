@@ -1,6 +1,6 @@
 export function shallowEqualArrays(
   a: unknown[] | undefined,
-  b: unknown[] | undefined
+  b: unknown[] | undefined,
 ): boolean {
   if (a === b) {
     return true;

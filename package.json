@@ -37,28 +37,28 @@
     "prepare": "yarn clean && yarn test && yarn build"
   },
   "devDependencies": {
-    "@babel/cli": "^7.20.7",
-    "@babel/core": "^7.20.12",
+    "@babel/cli": "^7.23.9",
+    "@babel/core": "^7.24.0",
     "@babel/plugin-proposal-nullish-coalescing-operator": "^7.18.6",
-    "@babel/plugin-proposal-optional-chaining": "^7.20.7",
-    "@babel/plugin-transform-modules-commonjs": "^7.20.11",
-    "@babel/preset-typescript": "^7.18.6",
-    "@types/jest": "^29.4.0",
-    "@typescript-eslint/eslint-plugin": "^5.49.0",
-    "@typescript-eslint/parser": "^5.49.0",
-    "babel-plugin-transform-define": "^2.1.0",
-    "eslint": "^8.32.0",
-    "jest": "^29.4.0",
-    "prettier": "^2.8.3",
-    "typescript": "^4.9.4"
+    "@babel/plugin-proposal-optional-chaining": "^7.21.0",
+    "@babel/plugin-transform-modules-commonjs": "^7.23.3",
+    "@babel/preset-typescript": "^7.23.3",
+    "@types/jest": "^29.5.12",
+    "@typescript-eslint/eslint-plugin": "^7.1.0",
+    "@typescript-eslint/parser": "^7.1.0",
+    "babel-plugin-transform-define": "^2.1.4",
+    "eslint": "^8.57.0",
+    "jest": "^29.7.0",
+    "prettier": "^3.2.5",
+    "typescript": "^5.3.3"
   },
   "peerDependencies": {
     "@types/node": "*",
-    "@types/webpack-env": "*",
     "@types/parcel-env": "*",
-    "webpack": ">=4",
+    "@types/webpack-env": "*",
+    "parcel": ">=2",
     "vite": ">=2",
-    "parcel": ">=2"
+    "webpack": ">=4"
   },
   "peerDependenciesMeta": {
     "@types/node": {

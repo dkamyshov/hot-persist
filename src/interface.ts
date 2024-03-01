@@ -10,4 +10,9 @@ export interface ModuleLike {
   webpackHot?: HotApi | null;
 }
 
-export type HotApiProvider = (() => HotApi | null | undefined) | ModuleLike;
+export type HotApiProvider =
+  | HotApi
+  | (() => HotApi | null | undefined)
+  | ModuleLike
+  | null
+  | undefined;

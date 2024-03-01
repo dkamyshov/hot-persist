@@ -4,7 +4,7 @@ const value = { x: 'first' };
 
 const persistedValue = persist(() => import.meta.webpackHot)(
   () => ({ ...value }),
-  []
+  [],
 );
 
 // @ts-ignore

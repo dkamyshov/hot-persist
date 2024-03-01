@@ -7,7 +7,7 @@ interface CallCounterMetadataItem {
 const callCounterMetadata = new WeakMap<HotApi, CallCounterMetadataItem>();
 
 const getOrCreateModulePersistenceMetadata = (
-  hot: HotApi
+  hot: HotApi,
 ): CallCounterMetadataItem => {
   const item = callCounterMetadata.get(hot);
 

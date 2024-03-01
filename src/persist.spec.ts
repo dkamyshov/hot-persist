@@ -1,4 +1,4 @@
-import type { ModuleLike } from './interface';
+import type { HotApi, ModuleLike } from './interface';
 import { persist } from './persist';
 
 type HMRData = Record<string, unknown>;
@@ -31,16 +31,19 @@ describe('persist', () => {
       };
     }
 
-    const mod = {
-      hot: {
-        dispose: (callback: DisposeCallback) => {
-          disposeCallbacks.push(callback);
-        },
-        get data() {
-          return currentData;
-        },
+    const hotApi: HotApi = {
+      dispose: (callback: DisposeCallback) => {
+        disposeCallbacks.push(callback);
       },
-    } as unknown as ModuleLike;
+      get data() {
+        return currentData;
+      },
+    };
+
+    const mod: ModuleLike = {
+      hot: hotApi,
+      webpackHot: hotApi,
+    };
 
     return {
       mod,
@@ -67,131 +70,198 @@ describe('persist', () => {
     process.env.NODE_ENV = env;
   });
 
-  const performTest = (
-    isUserDefinedKey: boolean,
-    isHostGetterSupplied: boolean
-  ) => {
-    it('must return old instance in development mode (with no deps specified)', () => {
-      const ctx = createModuleContext(true);
-      const hotApiHost = isHostGetterSupplied ? ctx.mod : () => ctx.mod.hot;
+  const performTest = (isUserDefinedKey: boolean, isHostedHotApi: boolean) => {
+    it('must return new instance if hot host is null', () => {
+      const ctx = createModuleContext(false);
+      const hotApiHost = isHostedHotApi ? null : () => null;
       const a = persist(hotApiHost)(
         factory,
         void 0,
-        isUserDefinedKey ? 'a' : void 0
+        isUserDefinedKey ? 'a' : void 0,
       );
       reloadModule(ctx);
       const b = persist(hotApiHost)(
         factory,
         void 0,
-        isUserDefinedKey ? 'a' : void 0
+        isUserDefinedKey ? 'a' : void 0,
+      );
+      expect(a).not.toBe(b);
+    });
+
+    it('must return new instance if hot host is undefined', () => {
+      const ctx = createModuleContext(false);
+      const hotApiHost = isHostedHotApi ? undefined : () => undefined;
+      const a = persist(hotApiHost)(
+        factory,
+        void 0,
+        isUserDefinedKey ? 'a' : void 0,
+      );
+      reloadModule(ctx);
+      const b = persist(hotApiHost)(
+        factory,
+        void 0,
+        isUserDefinedKey ? 'a' : void 0,
+      );
+      expect(a).not.toBe(b);
+    });
+
+    it('recognizes hot host with "dispose" method', () => {
+      const ctx = createModuleContext(true);
+      const hotApiHost = isHostedHotApi ? ctx.mod.hot : () => ctx.mod.hot;
+      const a = persist(hotApiHost)(
+        factory,
+        void 0,
+        isUserDefinedKey ? 'a' : void 0,
+      );
+      reloadModule(ctx);
+      const b = persist(hotApiHost)(
+        factory,
+        void 0,
+        isUserDefinedKey ? 'a' : void 0,
+      );
+      expect(a).toBe(b);
+    });
+
+    if (isHostedHotApi) {
+      it('recognizes webpack-style hot host', () => {
+        const ctx = createModuleContext(true);
+        const hotApiHost = { webpackHot: ctx.mod.webpackHot };
+        const a = persist(hotApiHost)(
+          factory,
+          void 0,
+          isUserDefinedKey ? 'a' : void 0,
+        );
+        reloadModule(ctx);
+        const b = persist(hotApiHost)(
+          factory,
+          void 0,
+          isUserDefinedKey ? 'a' : void 0,
+        );
+        expect(a).toBe(b);
+      });
+    }
+
+    it('must return old instance in development mode (with no deps specified)', () => {
+      const ctx = createModuleContext(true);
+      const hotApiHost = isHostedHotApi ? ctx.mod : () => ctx.mod.hot;
+      const a = persist(hotApiHost)(
+        factory,
+        void 0,
+        isUserDefinedKey ? 'a' : void 0,
+      );
+      reloadModule(ctx);
+      const b = persist(hotApiHost)(
+        factory,
+        void 0,
+        isUserDefinedKey ? 'a' : void 0,
       );
       expect(a).toBe(b);
     });
 
     it("must return old instance if deps didn't change", () => {
       const ctx = createModuleContext(true);
-      const hotApiHost = isHostGetterSupplied ? ctx.mod : () => ctx.mod.hot;
+      const hotApiHost = isHostedHotApi ? ctx.mod : () => ctx.mod.hot;
       const dep = {};
       const a = persist(hotApiHost)(
         factory,
         [dep],
-        isUserDefinedKey ? 'a' : void 0
+        isUserDefinedKey ? 'a' : void 0,
       );
       reloadModule(ctx);
       const b = persist(hotApiHost)(
         factory,
         [dep],
-        isUserDefinedKey ? 'a' : void 0
+        isUserDefinedKey ? 'a' : void 0,
       );
       expect(a).toBe(b);
     });
 
     it('must return new instance if deps changed', () => {
       const ctx = createModuleContext(true);
-      const hotApiHost = isHostGetterSupplied ? ctx.mod : () => ctx.mod.hot;
+      const hotApiHost = isHostedHotApi ? ctx.mod : () => ctx.mod.hot;
       const a = persist(hotApiHost)(
         factory,
         [{}],
-        isUserDefinedKey ? 'a' : void 0
+        isUserDefinedKey ? 'a' : void 0,
       );
       reloadModule(ctx);
       const b = persist(hotApiHost)(
         factory,
         [{}],
-        isUserDefinedKey ? 'a' : void 0
+        isUserDefinedKey ? 'a' : void 0,
       );
       expect(a).not.toBe(b);
     });
 
     it('must return new instance if NODE_ENV is production', () => {
       const ctx = createModuleContext(true);
-      const hotApiHost = isHostGetterSupplied ? ctx.mod : () => ctx.mod.hot;
+      const hotApiHost = isHostedHotApi ? ctx.mod : () => ctx.mod.hot;
       process.env.NODE_ENV = 'production';
       const a = persist(hotApiHost)(
         factory,
         void 0,
-        isUserDefinedKey ? 'a' : void 0
+        isUserDefinedKey ? 'a' : void 0,
       );
       reloadModule(ctx);
       const b = persist(hotApiHost)(
         factory,
         void 0,
-        isUserDefinedKey ? 'a' : void 0
+        isUserDefinedKey ? 'a' : void 0,
       );
       expect(a).not.toBe(b);
     });
 
     it('must return new instance if hot mode is unavailable', () => {
       const ctx = createModuleContext(false);
-      const hotApiHost = isHostGetterSupplied ? ctx.mod : () => ctx.mod.hot;
+      const hotApiHost = isHostedHotApi ? ctx.mod : () => ctx.mod.hot;
       const a = persist(hotApiHost)(
         factory,
         void 0,
-        isUserDefinedKey ? 'a' : void 0
+        isUserDefinedKey ? 'a' : void 0,
       );
       reloadModule(ctx);
       const b = persist(hotApiHost)(
         factory,
         void 0,
-        isUserDefinedKey ? 'a' : void 0
+        isUserDefinedKey ? 'a' : void 0,
       );
       expect(a).not.toBe(b);
     });
 
     it('must return new instances if the deps change in a cascade', () => {
       const ctx = createModuleContext(true);
-      const hotApiHost = isHostGetterSupplied ? ctx.mod : () => ctx.mod.hot;
+      const hotApiHost = isHostedHotApi ? ctx.mod : () => ctx.mod.hot;
       const dep = {};
       const a = persist(hotApiHost)(
         factory,
         [dep],
-        isUserDefinedKey ? 'a' : void 0
+        isUserDefinedKey ? 'a' : void 0,
       );
       const b = persist(hotApiHost)(
         factory,
         [a, {}],
-        isUserDefinedKey ? 'b' : void 0
+        isUserDefinedKey ? 'b' : void 0,
       );
       const c = persist(hotApiHost)(
         factory,
         [b],
-        isUserDefinedKey ? 'c' : void 0
+        isUserDefinedKey ? 'c' : void 0,
       );
       reloadModule(ctx);
       const d = persist(hotApiHost)(
         factory,
         [dep],
-        isUserDefinedKey ? 'a' : void 0
+        isUserDefinedKey ? 'a' : void 0,
       );
       const e = persist(hotApiHost)(
         factory,
         [d, {}],
-        isUserDefinedKey ? 'b' : void 0
+        isUserDefinedKey ? 'b' : void 0,
       );
       const f = persist(hotApiHost)(
         factory,
         [e],
-        isUserDefinedKey ? 'c' : void 0
+        isUserDefinedKey ? 'c' : void 0,
       );
       expect(a).toBe(d);
       expect(b).not.toBe(e);
@@ -200,38 +270,38 @@ describe('persist', () => {
 
     it("must return old instances if the deps don't change in a cascade", () => {
       const ctx = createModuleContext(true);
-      const hotApiHost = isHostGetterSupplied ? ctx.mod : () => ctx.mod.hot;
+      const hotApiHost = isHostedHotApi ? ctx.mod : () => ctx.mod.hot;
       const dep = {};
       const a = persist(hotApiHost)(
         factory,
         [dep],
-        isUserDefinedKey ? 'a' : void 0
+        isUserDefinedKey ? 'a' : void 0,
       );
       const b = persist(hotApiHost)(
         factory,
         [a],
-        isUserDefinedKey ? 'b' : void 0
+        isUserDefinedKey ? 'b' : void 0,
       );
       const c = persist(hotApiHost)(
         factory,
         [b],
-        isUserDefinedKey ? 'c' : void 0
+        isUserDefinedKey ? 'c' : void 0,
       );
       reloadModule(ctx);
       const d = persist(hotApiHost)(
         factory,
         [dep],
-        isUserDefinedKey ? 'a' : void 0
+        isUserDefinedKey ? 'a' : void 0,
       );
       const e = persist(hotApiHost)(
         factory,
         [d],
-        isUserDefinedKey ? 'b' : void 0
+        isUserDefinedKey ? 'b' : void 0,
       );
       const f = persist(hotApiHost)(
         factory,
         [e],
-        isUserDefinedKey ? 'c' : void 0
+        isUserDefinedKey ? 'c' : void 0,
       );
       expect(a).toBe(d);
       expect(b).toBe(e);
@@ -240,7 +310,7 @@ describe('persist', () => {
 
     it('extracts key from options object', () => {
       const ctx = createModuleContext(true);
-      const hotApiHost = isHostGetterSupplied ? ctx.mod : () => ctx.mod.hot;
+      const hotApiHost = isHostedHotApi ? ctx.mod : () => ctx.mod.hot;
       const a = persist(hotApiHost)(factory, void 0, {
         key: isUserDefinedKey ? 'a' : void 0,
       });
@@ -253,7 +323,7 @@ describe('persist', () => {
 
     it('runs cleanup function when the instance updates', () => {
       const ctx = createModuleContext(true);
-      const hotApiHost = isHostGetterSupplied ? ctx.mod : () => ctx.mod.hot;
+      const hotApiHost = isHostedHotApi ? ctx.mod : () => ctx.mod.hot;
       const cleanup = jest.fn();
       const a = persist(hotApiHost)(factory, [{}], {
         key: isUserDefinedKey ? 'a' : void 0,
@@ -269,7 +339,7 @@ describe('persist', () => {
 
     it("doesn't run cleanup if it is not specified", () => {
       const ctx = createModuleContext(true);
-      const hotApiHost = isHostGetterSupplied ? ctx.mod : () => ctx.mod.hot;
+      const hotApiHost = isHostedHotApi ? ctx.mod : () => ctx.mod.hot;
       const cleanup = jest.fn();
       persist(hotApiHost)(factory, [{}], {
         key: isUserDefinedKey ? 'a' : void 0,

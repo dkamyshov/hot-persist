@@ -1,5 +1,5 @@
 import { getCallCounter, resetCallCounter } from './callCounter';
-import type { HotApiProvider } from './interface';
+import type { HotApi, HotApiProvider } from './interface';
 import { shallowEqualArrays } from './shallowEqualArrays';
 
 interface PersistedItem<T> {
@@ -18,7 +18,7 @@ function getOrCreateInstance<T>(
   oldInstance: PersistedItem<T> | undefined,
   factory: () => T,
   options: PersistOptions<T> | undefined,
-  dependencies: unknown[] | undefined
+  dependencies: unknown[] | undefined,
 ): PersistedItem<T> {
   if (typeof oldInstance !== 'undefined') {
     if (shallowEqualArrays(oldInstance.dependencies, dependencies)) {
@@ -42,7 +42,7 @@ function getOrCreateInstance<T>(
 
 function getKey<T>(
   options: PersistOptions<T> | undefined,
-  callIndex: number
+  callIndex: number,
 ): string {
   const userDefinedKey = typeof options === 'string' ? options : options?.key;
 
@@ -51,6 +51,32 @@ function getKey<T>(
     `__dkamyshov_hot_persist_${__KEY_TOKEN}_indexed[${callIndex}]`
   );
 }
+
+const extractHotApi = (
+  hotApiProvider: HotApiProvider,
+): HotApi | null | undefined => {
+  if (typeof hotApiProvider === 'undefined' || hotApiProvider === null) {
+    return null;
+  }
+
+  if (typeof hotApiProvider === 'function') {
+    return hotApiProvider();
+  }
+
+  if ('dispose' in hotApiProvider) {
+    return hotApiProvider;
+  }
+
+  if ('hot' in hotApiProvider) {
+    return hotApiProvider.hot;
+  }
+
+  if ('webpackHot' in hotApiProvider) {
+    return hotApiProvider.webpackHot;
+  }
+
+  return null;
+};
 
 /**
  * Persist a value across hot reloads.
@@ -81,12 +107,9 @@ export function persist(hotApiProvider: HotApiProvider) {
   const persistor = function <T>(
     factory: () => T,
     dependencies?: unknown[],
-    options?: PersistOptions<T>
+    options?: PersistOptions<T>,
   ): T {
-    const hot =
-      typeof hotApiProvider === 'function'
-        ? hotApiProvider()
-        : hotApiProvider.webpackHot ?? hotApiProvider.hot;
+    const hot = extractHotApi(hotApiProvider);
 
     // uncomment the following to make sure
     // integration tests could fail
@@ -113,7 +136,7 @@ export function persist(hotApiProvider: HotApiProvider) {
       oldInstance,
       factory,
       options,
-      dependencies
+      dependencies,
     );
 
     hot.dispose((data) => {

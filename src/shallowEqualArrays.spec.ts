@@ -10,7 +10,7 @@ describe('shallowEqualArrays', () => {
     string,
     unknown[] | undefined,
     unknown[] | undefined,
-    boolean
+    boolean,
   ][] = [
     ['false if A is falsy', void 0, [], false],
     ['false if B is falsy', [], void 0, false],
