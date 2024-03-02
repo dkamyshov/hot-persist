@@ -3,13 +3,13 @@ import { resolve } from 'path';
 import { Ports } from './constants';
 import { copyFile, pause, run, type RunningProcess } from './utils';
 
-const repositoryRoot = resolve(__dirname, '../../repositories/webpack5');
+const repositoryRoot = resolve(__dirname, '../../repositories/webpack5-getter');
 
 const targetIndexFile = resolve(repositoryRoot, 'src/index.ts');
 const sourceBaseIndexFile = resolve(repositoryRoot, 'src/index.base.ts');
 const sourceNextIndexFile = resolve(repositoryRoot, 'src/index.next.ts');
 
-const pageAddress = `http://localhost:${Ports.Webpack5}`;
+const pageAddress = `http://localhost:${Ports.Webpack5Getter}`;
 
 let handle: RunningProcess | null = null;
 
@@ -21,7 +21,7 @@ test.beforeAll(async () => {
     'serve',
     '--hot',
     '--port',
-    Ports.Webpack5,
+    Ports.Webpack5Getter,
   ]);
 
   // wait until the "successful" message

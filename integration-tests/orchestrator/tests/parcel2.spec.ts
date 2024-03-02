@@ -14,6 +14,9 @@ const pageAddress = `http://localhost:${Ports.Parcel2}`;
 let handle: RunningProcess | null = null;
 
 test.beforeAll(async () => {
+  // restore the "original" file
+  await copyFile(sourceBaseIndexFile, targetIndexFile);
+
   handle = run(repositoryRoot, 'node_modules/.bin/parcel', [
     '--port',
     Ports.Parcel2,

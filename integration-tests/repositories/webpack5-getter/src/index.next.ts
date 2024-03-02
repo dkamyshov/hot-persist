@@ -1,10 +1,10 @@
 import { persist } from '@dkamyshov/hot-persist';
 
-const value = { x: 'first' };
+const value = { x: 'second' };
 
-const persistedValue = persist(import.meta.webpackHot)(
+const persistedValue = persist(() => import.meta.webpackHot)(
   () => ({ ...value }),
-  [],
+  []
 );
 
 // @ts-ignore

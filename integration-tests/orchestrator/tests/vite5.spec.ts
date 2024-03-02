@@ -3,29 +3,28 @@ import { resolve } from 'path';
 import { Ports } from './constants';
 import { copyFile, pause, run, type RunningProcess } from './utils';
 
-const repositoryRoot = resolve(__dirname, '../../repositories/webpack5');
+const repositoryRoot = resolve(__dirname, '../../repositories/vite5');
 
-const targetIndexFile = resolve(repositoryRoot, 'src/index.ts');
-const sourceBaseIndexFile = resolve(repositoryRoot, 'src/index.base.ts');
-const sourceNextIndexFile = resolve(repositoryRoot, 'src/index.next.ts');
+const targetMainFile = resolve(repositoryRoot, 'src/main.ts');
+const sourceBaseMainFile = resolve(repositoryRoot, 'src/main.base.ts');
+const sourceNextMainFile = resolve(repositoryRoot, 'src/main.next.ts');
 
-const pageAddress = `http://localhost:${Ports.Webpack5}`;
+const pageAddress = `http://localhost:${Ports.Vite5}`;
 
 let handle: RunningProcess | null = null;
 
 test.beforeAll(async () => {
   // restore the "original" file
-  await copyFile(sourceBaseIndexFile, targetIndexFile);
+  await copyFile(sourceBaseMainFile, targetMainFile);
 
-  handle = run(repositoryRoot, 'node_modules/.bin/webpack', [
-    'serve',
-    '--hot',
+  handle = run(repositoryRoot, 'node_modules/.bin/vite', [
+    '--strictPort',
     '--port',
-    Ports.Webpack5,
+    Ports.Vite5,
   ]);
 
-  // wait until the "successful" message
-  await handle.waitForTextInStdout('successful');
+  // give vite some time to start
+  await pause();
 });
 
 test.afterAll(() => {
@@ -33,9 +32,14 @@ test.afterAll(() => {
   handle = null;
 });
 
-test.beforeEach(async () => {
+test.beforeEach(async ({ page }) => {
   // restore the "original" file
-  await copyFile(sourceBaseIndexFile, targetIndexFile);
+  await copyFile(sourceBaseMainFile, targetMainFile);
+
+  // open the page so Vite actually (re)builds the "app"
+  // and give Vite some time
+  await page.goto(pageAddress);
+  await pause();
 });
 
 test('persists modified value across hot reloads', async ({ page }) => {
@@ -51,7 +55,7 @@ test('persists modified value across hot reloads', async ({ page }) => {
   // modify the value in the persisted object
   await page.evaluate('window.persistedValue.x = "modified";');
 
-  await copyFile(sourceNextIndexFile, targetIndexFile); // simulate file edit
+  await copyFile(sourceNextMainFile, targetMainFile); // simulate file edit
   await pause(); // allow some time for update to be applied
 
   const nextValue = await page.evaluate('window.value.x');

@@ -14,6 +14,9 @@ const pageAddress = `http://localhost:${Ports.Webpack4}`;
 let handle: RunningProcess | null = null;
 
 test.beforeAll(async () => {
+  // restore the "original" file
+  await copyFile(sourceBaseIndexFile, targetIndexFile);
+
   handle = run(repositoryRoot, 'node_modules/.bin/webpack', [
     'serve',
     '--hot',

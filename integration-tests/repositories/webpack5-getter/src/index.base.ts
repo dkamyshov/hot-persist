@@ -2,9 +2,9 @@ import { persist } from '@dkamyshov/hot-persist';
 
 const value = { x: 'first' };
 
-const persistedValue = persist(import.meta.webpackHot)(
+const persistedValue = persist(() => import.meta.webpackHot)(
   () => ({ ...value }),
-  [],
+  []
 );
 
 // @ts-ignore

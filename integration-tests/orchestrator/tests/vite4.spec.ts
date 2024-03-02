@@ -14,6 +14,9 @@ const pageAddress = `http://localhost:${Ports.Vite4}`;
 let handle: RunningProcess | null = null;
 
 test.beforeAll(async () => {
+  // restore the "original" file
+  await copyFile(sourceBaseMainFile, targetMainFile);
+
   handle = run(repositoryRoot, 'node_modules/.bin/vite', [
     '--strictPort',
     '--port',

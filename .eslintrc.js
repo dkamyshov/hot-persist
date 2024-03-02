@@ -10,6 +10,7 @@ module.exports = {
       './integration-tests/orchestrator/tsconfig.json',
       './integration-tests/repositories/webpack4/tsconfig.json',
       './integration-tests/repositories/webpack5/tsconfig.json',
+      './integration-tests/repositories/webpack5-getter/tsconfig.json',
       './integration-tests/repositories/vite2/tsconfig.json',
       './integration-tests/repositories/vite3/tsconfig.json',
       './integration-tests/repositories/vite4/tsconfig.json',

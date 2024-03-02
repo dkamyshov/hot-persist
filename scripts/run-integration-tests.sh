@@ -28,6 +28,10 @@ cd "$CWD/integration-tests/repositories/webpack5"
 npm ci # make sure to do `npm i` when creating a new test repo first
 npm install --no-save "../../../$FILENAME"
 
+cd "$CWD/integration-tests/repositories/webpack5-getter"
+npm ci # make sure to do `npm i` when creating a new test repo first
+npm install --no-save "../../../$FILENAME"
+
 cd "$CWD/integration-tests/repositories/vite2"
 npm ci # make sure to do `npm i` when creating a new test repo first
 npm install --no-save "../../../$FILENAME"
@@ -37,6 +41,10 @@ npm ci # make sure to do `npm i` when creating a new test repo first
 npm install --no-save "../../../$FILENAME"
 
 cd "$CWD/integration-tests/repositories/vite4"
+npm ci # make sure to do `npm i` when creating a new test repo first
+npm install --no-save "../../../$FILENAME"
+
+cd "$CWD/integration-tests/repositories/vite5"
 npm ci # make sure to do `npm i` when creating a new test repo first
 npm install --no-save "../../../$FILENAME"
 
