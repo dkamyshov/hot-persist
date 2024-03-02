@@ -1,6 +1,6 @@
 # @dkamyshov/hot-persist
 
-Dead simple persistence API for preserving data across hot reloads (supports webpack 4/5, vite 2/3/4, parcel 2). Zero dependencies!
+Dead simple persistence API for preserving data across hot reloads (supports webpack 4/5, vite 2/3/4/5, parcel 2). Zero dependencies!
 
 ## Installation
 
