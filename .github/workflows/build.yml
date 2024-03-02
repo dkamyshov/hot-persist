@@ -8,12 +8,12 @@ jobs:
 
     strategy:
       matrix:
-        node: [14, 16]
+        node: [16, 18, 20, 21]
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Node ${{ matrix.node }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node }}
-    - run: yarn
+      - uses: actions/checkout@v3
+      - name: Node ${{ matrix.node }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+      - run: yarn

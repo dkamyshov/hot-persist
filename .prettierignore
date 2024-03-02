@@ -4,6 +4,7 @@ yarn.lock
 .*
 !.vscode
 !.eslintrc.js
+!.github
 integration-tests/repositories/*/dist
 integration-tests/orchestrator/playwright-report
 integration-tests/**/*.svg
